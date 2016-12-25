@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<input type="checkbox" id="rubber"> &nbsp;Eraser
+<canvas id="draw" width="800" height="800" style="border: 1px solid #bada55"></canvas>
+<script>
+	var canvas  = document.querySelector('#draw');
+	var ctx = canvas.getContext('2d');
+	var rubber = document.querySelector('#rubber');
+	console.log(rubber);
+
+	// ctx.fillStyle = "#dddddd"
+	console.log(ctx);
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+
+	ctx.strokeStyle = "#BADA55";
+	ctx.lineJoin = "round";
+	ctx.lineCap = "round";
+	ctx.lineWidth = 50;
+
+	var lastX = 0;
+	var lastY = 0;
+	var isDrawing = false;
+	var direction = true;
+	var hue=0;
+	var erase = false;
+
+
+	function draw(e){
+		if(!isDrawing) return;
+
+		ctx.strokeStyle = `hsl(${hue},100%,50%)`;
+		ctx.beginPath();
+
+		ctx.moveTo(lastX,lastY);
+		ctx.lineTo(e.offsetX, e.offsetY);
+
+		ctx.stroke();
+
+		[lastX,lastY] = [e.offsetX,e.offsetY];
+
+		hue++;
+
+		if(hue>=360) hue=0;
+		console.log(ctx.lineWidth);
+		if(ctx.lineWidth>=50 || ctx.lineWidth<=1){
+			direction = !direction;
+		};
+
+		if(direction){
+			ctx.lineWidth++;
+		} else {
+			ctx.lineWidth--;
+		}
+
+	}
+
+	function doErase(e){
+		if(!isDrawing) return;
+		ctx.strokeStyle = "#ffffff";
+		ctx.lineWidth=50;
+		ctx.beginPath();
+
+		ctx.moveTo(lastX,lastY);
+		ctx.lineTo(e.offsetX, e.offsetY);
+
+		ctx.stroke();
+
+		[lastX,lastY] = [e.offsetX,e.offsetY];
+
+	}
+
+
+
+
+	canvas.addEventListener('mousedown',function(e){
+		// console.log(e);
+		isDrawing = true;
+		direction = true;
+		[lastX,lastY] = [e.offsetX,e.offsetY];
+	});
+
+	canvas.addEventListener('mouseup',function(e){
+		isDrawing = false;
+
+	});
+	canvas.addEventListener('mouseout',function(e){
+		isDrawing = false;
+	});
+	canvas.addEventListener('mousemove',function(e){
+		if (erase == true){
+			doErase(e);
+		} else {draw(e);}
+	});
+
+	rubber.addEventListener('change',function(e){
+		
+		// console.log(e.target.checked);
+		// console.log(e.target);
+		if(rubber.checked) {erase = true;}
+		else erase = false;
+	});
+
+</script>
+
+<style>
+  html, body {
+    margin:0;
+  }
+</style>
+
+</body>
+</html>
